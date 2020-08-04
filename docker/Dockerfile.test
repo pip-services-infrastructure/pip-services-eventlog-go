@@ -1,0 +1,17 @@
+# Start with the golang v1.13 image
+FROM golang:1.13
+
+# Set a working directory
+WORKDIR /app
+
+# Copy the package files
+COPY go.mod go.sum ./
+
+# Install all go_modules
+RUN go mod download
+
+# Copy the entire project
+COPY . .
+
+# Specify the command from running tests
+CMD go test -v ./test/...

@@ -1,0 +1,62 @@
+---
+# Container descriptor
+- descriptor: "pip-services:context-info:default:default:1.0"
+  name: "pip-services-eventlog"
+  description: "Eventlog microservice for pip-services"
+
+# Console logger
+- descriptor: "pip-services:logger:console:default:1.0"
+  level: "trace"
+
+# Performance counters that posts values to log
+- descriptor: "pip-services:counters:log:default:1.0"
+  level: "trace"
+
+{{#if MEMORY_ENABLED}}
+# In-memory persistence. Use only for testing!
+- descriptor: "pip-services-eventlog:persistence:memory:default:1.0"
+{{/if}}
+
+{{#if FILE_ENABLED}}
+# File persistence. Use it for testing of for simple standalone deployments
+- descriptor: "pip-services-eventlog:persistence:file:default:1.0"
+  path: {{FILE_PATH}}{{#unless FILE_PATH}}"../data/eventlog.json"{{/unless}}
+{{/if}}
+
+{{#if MONGO_ENABLED}}
+# MongoDB Persistence
+- descriptor: "pip-services-eventlog:persistence:mongodb:default:1.0"
+  collection: {{MONGO_COLLECTION}}{{#unless MONGO_COLLECTION}}eventlog{{/unless}}
+  connection:
+    uri: {{{MONGO_SERVICE_URI}}}
+    host: {{{MONGO_SERVICE_HOST}}}{{#unless MONGO_SERVICE_HOST}}localhost{{/unless}}
+    port: {{MONGO_SERVICE_PORT}}{{#unless MONGO_SERVICE_PORT}}27017{{/unless}}
+    database: {{MONGO_DB}}{{#unless MONGO_DB}}app{{/unless}}
+  credential:
+    username: {{MONGO_USER}}
+    password: {{MONGO_PASS}}
+{{/if}}
+
+{{^if MEMORY_ENABLED}}{{^if FILE_ENABLED}}{{^if MONGO_ENABLED}}
+# Default in-memory persistence
+- descriptor: "pip-services-eventlog:persistence:memory:default:1.0"
+{{/if}}{{/if}}{{/if}}
+
+# Default controller
+- descriptor: "pip-services-eventlog:controller:default:default:1.0"
+
+# Common HTTP endpoint
+- descriptor: "pip-services:endpoint:http:default:1.0"
+  connection:
+    protocol: "http"
+    host: "0.0.0.0"
+    port: 8080
+
+# HTTP endpoint version 1.0
+- descriptor: "pip-services-eventlog:service:http:default:1.0"
+
+# Heartbeat service
+- descriptor: "pip-services:heartbeat-service:http:default:1.0"
+
+# Status service
+- descriptor: "pip-services:status-service:http:default:1.0"

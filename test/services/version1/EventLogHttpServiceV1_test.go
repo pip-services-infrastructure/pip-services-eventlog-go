@@ -14,6 +14,7 @@ import (
 	services1 "github.com/pip-services-infrastructure/pip-services-eventlog-go/services/version1"
 	cconf "github.com/pip-services3-go/pip-services3-commons-go/config"
 	cdata "github.com/pip-services3-go/pip-services3-commons-go/data"
+	cerr "github.com/pip-services3-go/pip-services3-commons-go/errors"
 	cref "github.com/pip-services3-go/pip-services3-commons-go/refer"
 	"github.com/stretchr/testify/assert"
 )
@@ -109,15 +110,25 @@ func invoke(url string, body *cdata.AnyValueMap, result interface{}) error {
 		return postErr
 	}
 
+	if postResponse.StatusCode == 204 {
+		return nil
+	}
+
 	resBody, bodyErr := ioutil.ReadAll(postResponse.Body)
 	if bodyErr != nil {
 		return bodyErr
 	}
 
-	if result == nil {
+	if postResponse.StatusCode >= 400 {
+		appErr := cerr.ApplicationError{}
+		json.Unmarshal(resBody, &appErr)
+		return &appErr
+	}
+
+	if result == nil || postResponse.StatusCode == 204 {
 		return nil
 	}
 
-	jsonErr := json.Unmarshal(resBody, &result)
+	jsonErr := json.Unmarshal(resBody, result)
 	return jsonErr
 }

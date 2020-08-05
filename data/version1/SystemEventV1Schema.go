@@ -14,11 +14,11 @@ func NewSystemEventV1Schema() *SystemEventV1Schema {
 	c.ObjectSchema = *cvalid.NewObjectSchema()
 
 	c.WithOptionalProperty("id", cconv.String)
-	c.WithOptionalProperty("time", cconv.DateTime)
+	c.WithOptionalProperty("time", cconv.String) //cconv.DateTime
 	c.WithOptionalProperty("correlation_id", cconv.String)
 	c.WithOptionalProperty("source", cconv.String)
 	c.WithRequiredProperty("type", cconv.String)
-	c.WithRequiredProperty("severity", cconv.Long)
+	c.WithRequiredProperty("severity", cconv.Double)
 	c.WithOptionalProperty("message", cconv.String)
 	c.WithOptionalProperty("details", cconv.Map)
 	return &c

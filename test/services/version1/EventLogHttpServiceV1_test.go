@@ -125,7 +125,7 @@ func invoke(url string, body *cdata.AnyValueMap, result interface{}) error {
 		return &appErr
 	}
 
-	if result == nil || postResponse.StatusCode == 204 {
+	if result == nil {
 		return nil
 	}
 

@@ -136,6 +136,8 @@ github.com/pip-services3-go/pip-services3-rpc-go v1.0.0 h1:MUAURWTkgII0yWn/6Nta5
 github.com/pip-services3-go/pip-services3-rpc-go v1.0.0/go.mod h1:boD+x5t7ft4JOTVpHwrn1hz2mQng/zvo9lnLqeE/oPg=
 github.com/pip-services3-go/pip-services3-rpc-go v1.0.1 h1:/xgiKJzrwbNYa2m8vtYcCY6o6MhpWGPHwtYRvnYFfR4=
 github.com/pip-services3-go/pip-services3-rpc-go v1.0.1/go.mod h1:aOoZ0x77elZw1WQWk0WT1s48G5q5vApM3X86jxf7iMI=
+github.com/pip-services3-go/pip-services3-rpc-go v1.0.2 h1:Q9n0GGV9rUi4gQyDJ/3DwD3KV1rp67q904Nprh4afu0=
+github.com/pip-services3-go/pip-services3-rpc-go v1.0.2/go.mod h1:aOoZ0x77elZw1WQWk0WT1s48G5q5vApM3X86jxf7iMI=
 github.com/pip-templates/pip-templates-microservice-go v0.0.0-20200804052516-9a867bd13b8a h1:ipKHl/Sf8iDkGwzVRIu3IS8XgBVy/te6fc7Yg04t/00=
 github.com/pip-templates/pip-templates-microservice-go v0.0.0-20200804052516-9a867bd13b8a/go.mod h1:eOo7Vviy3fM5P8dP1NOfx22lGgAwSOUDT/M9AhDLoRc=
 github.com/pip-templates/pip-templates-microservice-go v0.0.0-20200804092218-baf979cdc30f h1:oOSQV2ZFp3BZxLzioEcQxjVJd8eNooF1tYQk6u+50YY=

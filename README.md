@@ -13,10 +13,10 @@ This microservice has no dependencies on other microservices.
 
 <a name="links"></a> Quick Links:
 
-* [Download Links](doc/Downloads.md)
-* [Development Guide](doc/Development.md)
-* [Configuration Guide](doc/Configuration.md)
-* [Deployment Guide](doc/Deployment.md)
+* [Download Links](docs/Downloads.md)
+* [Development Guide](docs/Development.md)
+* [Configuration Guide](docs/Configuration.md)
+* [Deployment Guide](docs/Deployment.md)
 * Client SDKs
   - [Node.js SDK](https://github.com/pip-services/pip-clients-eventlog-node)
   - [Golang SDK](https://github.com/pip-services/pip-clients-eventlog-go)
@@ -29,34 +29,29 @@ This microservice has no dependencies on other microservices.
 Logical contract of the microservice is presented below. For physical implementation (HTTP/REST, Thrift, Seneca, Lambda, etc.),
 please, refer to documentation of the specific protocol.
 
-```typescript
-class SystemEventV1 implements IStringIdentifiable {
-    public id: string;
-    public time: Date;
-    public correlation_id: string;
-    public source: string;
-    public type: string;
-    public severity: EventLogSeverityV1;
-    public message: string;
-    public details: StringValueMap;
-
+```golang
+type SystemEventV1 struct {
+	Id            string               `json:"id" bson:"_id"`
+	Time          time.Time            `json:"time" bson:"time"`
+	CorrelationId string               `json:"correlation_id" bson:"correlation_id"`
+	Source        string               `json:"source" bson:"source"`
+	Type          string               `json:"type" bson:"type"`
+	Severity      int64                `json:"severity" bson:"severity"`
+	Message       string               `json:"message" bson:"message"`
+	Details       cdata.StringValueMap `json:"details" bson:"details"`
 }
 
-class EventLogTypeV1
-{
-    public static readonly Restart: string = "restart";
-    public static readonly Failure: string = "failure";
-    public static readonly Warning: string = "warning";
-    public static readonly Transaction: string = "transaction";
-    public static readonly Other: string = "other";
-}
+// EventLogTypeV1
+const Restart = "restart"
+const Failure = "failure"
+const Warning = "warning"
+const Transaction = "transaction"
+const Other = "other"
 
-enum EventLogSeverityV1
-{
-    Critical = 0,
-    Important = 500,
-    Informational = 1000
-}
+// EventLogSeverityV1
+const Critical = 0
+const Important = 500
+const Informational = 1000
 
 interface IEventLogV1 {
     getEvents(correlationId: string, filter: FilterParams, paging: PagingParams, 
@@ -71,7 +66,7 @@ interface IEventLogV1 {
 
 Right now the only way to get the microservice is to check it out directly from github repository
 ```bash
-git clone git@github.com:pip-services-infrastructure/pip-services-eventlog-node.git
+git clone git@github.com:pip-services-infrastructure/pip-services-eventlog-go.git
 ```
 
 Pip.Service team is working to implement packaging and make stable releases available for your 
@@ -107,7 +102,7 @@ For more information on the microservice configuration see [Configuration Guide]
 
 Start the microservice using the command:
 ```bash
-node run
+go run ./bin/run.go
 ```
 
 ## Use
@@ -115,89 +110,80 @@ node run
 The easiest way to work with the microservice is to use client SDK. 
 The complete list of available client SDKs for different languages is listed in the [Quick Links](#links)
 
-If you use Node.js then you should add dependency to the client SDK into **package.json** file of your project
-```javascript
-{
-    ...
-    dependencies: {
-        ...
-        "pip-clients-eventlog-node": "^1.0.*"
-        ...
-    }
-}
+If you use Golang then you should add dependency to the client SDK into **go.mod** file of your project
+```golang
+...
+require (
+
+    github.com/pip-services-infrastructure/pip-services-eventlog-go v1.0.0
+    ....
+)
+
 ```
 
 Inside your code get the reference to the client SDK
-```javascript
-var sdk = new require('pip-clients-eventlog-node');
+```golang
+import (
+	clients1 "github.com/pip-services-infrastructure/pip-clients-eventlog-go/version1"
+)
+
+var client *clients1.EventLogHttpClientV1
 ```
 
 Define client configuration parameters that match configuration of the microservice external API
-```javascript
+```golang
 // Client configuration
-var config = {
-    connection: {
-        protocol: 'http',
-        host: 'localhost', 
-        port: 8080
-    }
-};
+httpConfig := cconf.NewConfigParamsFromTuples(
+		"connection.protocol", "http",
+		"connection.port", "3000",
+		"connection.host", "localhost",
+	)
+
+	client = clients1.NewEventLogHttpClientV1()
+	client.Configure(httpConfig)
 ```
 
 Instantiate the client and open connection to the microservice
-```javascript
-// Create the client instance
-var client = sdk.EventLogHttpClientV1(config);
+```golang
 
 // Connect to the microservice
-client.open(null, function(err) {
-    if (err) {
-        console.error('Connection to the microservice failed');
-        console.error(err);
-        return;
+err := client.Open("")
+ if (err) {
+        panic("Connection to the microservice failed");
     }
-    
-    // Work with the microservice
-    ...
-});
+defer client.Close("")
+// Work with the microservice
+
 ```
 
 Now the client is ready to perform operations
-```javascript
+```golang
 // Log system event
-client.logEvent(
-    null,
-    {
-        type: 'restart',
-        source: 'server1',
-        message: 'Restarted server'
-    },
-    function (err, event) {
-        ...
+event1:=&clients1.SystemEventV1{
+        Type: "restart",
+        source: "server1",
+        Message: "Restarted server",
     }
+
+err := client.LogEvent(
+    "",
+    event1,
 );
 ```
 
-```javascript
-var now = new Date();
+```golang
+var now = time.Now();
 
 // Get the list system events
-client.getEvents(
-    null,
-    {
-        from_time: new Date(now.getTime() - 24 * 3600 * 1000),
-        to_time: now,
-        source: 'server1'
-    },
-    {
-        total: true,
-        skip: 0, 
-        take: 10  
-    },
-    function(err, page) {
-    ...    
-    }
+page, err1 := client.getEvents(
+    "",
+    cdata.NewFilterParamsFromTuples(
+        "from_time": new Date(now.getTime() - 24 * 3600 * 1000),
+        "to_time": now,
+        "source": "server1"
+    ), cdata.NewEmptyPagingParams(),
 );
+
 ```    
 
 ## Acknowledgements

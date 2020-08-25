@@ -71,7 +71,7 @@ git clone git@github.com:pip-services-infrastructure/pip-services-eventlog-go.gi
 
 Pip.Service team is working to implement packaging and make stable releases available for your 
 as zip downloadable archieves.
-
+`
 ## Run
 
 Add **config.json** file to the root of the microservice folder and set configuration parameters.
